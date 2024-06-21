@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Upload Photo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Upload Photo</h1>
+    <input type="file" id="fileButton" multiple>
+    <select id="keyType">
+        <option value="photo">Photo</option>
+        <option value="album">Album</option>
+        <option value="resepsi">Resepsi</option>
+        <option value="akad">Akad</option>
+        <option value="peresmian">Peresmian</option>
+        <option value="idul_adha">Idul Adha</option>
+        <option value="idul_fitri">Idul Fitri</option>
+        <option value="kajian">Kajian</option>
+        <option value="img_slide">Img Slide</option>
+    </select>
+    <button id="uploadButton">Upload</button>
+    <div id="uploadStatus"></div>
+
+    <!-- Dropdown untuk memilih kategori galeri -->
+    <h2>Galeri</h2>
+    <select id="galleryCategory">
+        <option value="">Pilih Kategori</option>
+        <option value="photo">Photo</option>
+        <option value="album">Album</option>
+        <option value="resepsi">Resepsi</option>
+        <option value="akad">Akad</option>
+        <option value="peresmian">Peresmian</option>
+        <option value="idul_adha">Idul Adha</option>
+        <option value="idul_fitri">Idul Fitri</option>
+        <option value="kajian">Kajian</option>
+        <option value="img_slide">Img Slide</option>
+    </select>
+    <button id="loadGalleryButton">Tampilkan Galeri</button>
+
+    <div id="gallery"></div>
+    <div id="modal" style="display:none;">
+        <span id="closeModal">&times;</span>
+        <img id="modalImg">
+        <div id="captionText"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="app.js"></script>
+
+</body>
+</html>
