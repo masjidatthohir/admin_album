@@ -74,16 +74,47 @@ document.addEventListener('DOMContentLoaded', function() {
             firebase.database().ref(category).once('value').then(function(snapshot) {
                 snapshot.forEach(function(childSnapshot) {
                     const photo = childSnapshot.val();
+                    const imgContainer = document.createElement('div');
+                    imgContainer.classList.add('img-container');
+                    
                     const img = document.createElement('img');
                     img.src = photo.url;
                     img.dataset.key = childSnapshot.key;
+                    img.dataset.category = category;
                     img.addEventListener('click', function() {
                         openPhotoDetails(photo, category);
                     });
-                    galleryDiv.appendChild(img);
+
+                    const deleteIcon = document.createElement('i');
+                    deleteIcon.classList.add('fas', 'fa-trash-alt', 'delete-icon');
+                    deleteIcon.dataset.key = childSnapshot.key;
+                    deleteIcon.dataset.category = category;
+                    deleteIcon.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                        deletePhoto(deleteIcon.dataset.category, deleteIcon.dataset.key, photo.name);
+                    });
+
+                    imgContainer.appendChild(img);
+                    imgContainer.appendChild(deleteIcon);
+                    galleryDiv.appendChild(imgContainer);
                 });
             });
         }
+    }
+
+    function deletePhoto(category, key, fileName) {
+        // Delete from database
+        firebase.database().ref(`${category}/${key}`).remove().then(function() {
+            // Delete from storage
+            const storageRef = firebase.storage().ref('photos/' + fileName);
+            storageRef.delete().then(function() {
+                loadGallery(category); // Reload the gallery after deletion
+            }).catch(function(error) {
+                alert('Error deleting file: ' + error.message);
+            });
+        }).catch(function(error) {
+            alert('Error deleting database entry: ' + error.message);
+        });
     }
 
     function openPhotoDetails(photo, category) {
