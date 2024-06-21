@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     deleteIcon.dataset.category = category;
                     deleteIcon.addEventListener('click', function(event) {
                         event.stopPropagation();
-                        deletePhoto(deleteIcon.dataset.category, deleteIcon.dataset.key, photo.name);
+                        confirmDelete(deleteIcon.dataset.category, deleteIcon.dataset.key, photo.name);
                     });
 
                     imgContainer.appendChild(img);
@@ -99,6 +99,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     galleryDiv.appendChild(imgContainer);
                 });
             });
+        }
+    }
+
+    function confirmDelete(category, key, fileName) {
+        const confirmation = confirm("Are you sure you want to delete this image?");
+        if (confirmation) {
+            deletePhoto(category, key, fileName);
         }
     }
 
