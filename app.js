@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const galleryDiv = document.getElementById('gallery');
 
     if (uploadButton) {
-        uploadButton.addEventListener('click', function() {
+        uploadButton.addEventListener('click', async function() {
             const files = fileButton.files;
             const category = keyType.value;
 
@@ -16,30 +16,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 const promises = [];
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
-                    const storageRef = firebase.storage().ref('photos/' + file.name);
-                    const uploadTask = storageRef.put(file);
 
-                    const promise = new Promise((resolve, reject) => {
-                        uploadTask.on('state_changed',
-                            function(snapshot) {
-                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                                uploadStatus.textContent = `Uploading ${file.name}: ${progress}% done`;
-                            },
-                            function(error) {
-                                reject(error);
-                            },
-                            function() {
-                                uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
-                                    const photoData = {
-                                        url: downloadURL,
-                                        name: file.name
-                                    };
-                                    firebase.database().ref(`${category}`).push(photoData).then(resolve).catch(reject);
-                                });
-                            }
-                        );
-                    });
-                    promises.push(promise);
+                    // Compress the image
+                    try {
+                        const compressedFile = await imageCompression(file, {
+                            maxSizeMB: 1,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true
+                        });
+
+                        const storageRef = firebase.storage().ref('photos/' + compressedFile.name);
+                        const uploadTask = storageRef.put(compressedFile);
+
+                        const promise = new Promise((resolve, reject) => {
+                            uploadTask.on('state_changed',
+                                function(snapshot) {
+                                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                    uploadStatus.textContent = `Uploading ${compressedFile.name}: ${progress}% done`;
+                                },
+                                function(error) {
+                                    reject(error);
+                                },
+                                function() {
+                                    uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                                        const photoData = {
+                                            url: downloadURL,
+                                            name: compressedFile.name
+                                        };
+                                        firebase.database().ref(`${category}`).push(photoData).then(resolve).catch(reject);
+                                    });
+                                }
+                            );
+                        });
+                        promises.push(promise);
+                    } catch (error) {
+                        uploadStatus.textContent = 'Error compressing ' + file.name + ': ' + error.message;
+                    }
                 }
 
                 Promise.all(promises)
